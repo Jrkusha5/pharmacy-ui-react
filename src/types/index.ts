@@ -17,6 +17,7 @@ export interface Medicine {
   batchNumber: string;
   price: number;
   stock: number;
+  minStock: number;
   expiryDate: string;
   unit: string; // e.g., 'mg', 'ml', 'tablet', 'vial'
   status: 'In Stock' | 'Low Stock' | 'Expired';
@@ -53,6 +54,8 @@ export interface Sale {
   id: string;
   date: string;
   customerName: string;
+  customerAge?: number;
+  prescriptionUrl?: string;
   totalAmount: number;
   status: 'Paid' | 'Pending';
   items: SaleItem[];

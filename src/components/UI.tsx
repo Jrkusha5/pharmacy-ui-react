@@ -50,7 +50,15 @@ export const Card = ({ children, className }: { children: React.ReactNode; class
   </div>
 );
 
-export const Badge = ({ children, variant = 'default' }: { children: React.ReactNode; variant?: 'default' | 'success' | 'warning' | 'error' | 'info' }) => {
+export const Badge = ({ 
+  children, 
+  variant = 'default',
+  className
+}: { 
+  children: React.ReactNode; 
+  variant?: 'default' | 'success' | 'warning' | 'error' | 'info';
+  className?: string;
+}) => {
   const variants = {
     default: 'bg-gray-100 text-gray-800',
     success: 'bg-green-100 text-green-800',
@@ -59,7 +67,7 @@ export const Badge = ({ children, variant = 'default' }: { children: React.React
     info: 'bg-blue-100 text-blue-800',
   };
   return (
-    <span className={cn('px-2.5 py-0.5 rounded-full text-xs font-medium', variants[variant])}>
+    <span className={cn('px-2.5 py-0.5 rounded-full text-xs font-medium', variants[variant], className)}>
       {children}
     </span>
   );

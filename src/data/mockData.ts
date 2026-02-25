@@ -1,20 +1,20 @@
 import { Medicine, Sale, Supplier, Customer, Purchase, User, StockAdjustment } from '../types';
 
 export const medicines: Medicine[] = [
-  { id: '1', name: 'Amoxicillin', category: 'Antibiotics', batchNumber: 'AMX-2023-001', price: 12.50, stock: 150, expiryDate: '2025-06-15', status: 'In Stock', unit: '500mg' },
-  { id: '2', name: 'Paracetamol', category: 'Analgesics', batchNumber: 'PCM-2023-042', price: 5.00, stock: 450, expiryDate: '2025-12-01', status: 'In Stock', unit: '500mg' },
-  { id: '3', name: 'Ibuprofen', category: 'Anti-inflammatory', batchNumber: 'IBU-2023-112', price: 8.75, stock: 8, expiryDate: '2024-11-20', status: 'Low Stock', unit: '400mg' },
-  { id: '4', name: 'Cetirizine Syrup', category: 'Antihistamine', batchNumber: 'CET-2023-089', price: 15.20, stock: 0, expiryDate: '2023-10-15', status: 'Expired', unit: '5mg/5ml' },
-  { id: '5', name: 'Metformin', category: 'Antidiabetic', batchNumber: 'MET-2023-005', price: 10.00, stock: 200, expiryDate: '2026-01-10', status: 'In Stock', unit: '500mg' },
-  { id: '6', name: 'Amlodipine', category: 'Antihypertensive', batchNumber: 'AML-2023-014', price: 18.30, stock: 15, expiryDate: '2025-03-22', status: 'Low Stock', unit: '5mg' },
-  { id: '7', name: 'Omeprazole', category: 'Antacid', batchNumber: 'OME-2023-077', price: 22.00, stock: 80, expiryDate: '2025-08-05', status: 'In Stock', unit: '20mg' },
+  { id: '1', name: 'Amoxicillin', category: 'Antibiotics', batchNumber: 'AMX-2023-001', price: 12.50, stock: 150, minStock: 20, expiryDate: '2025-06-15', status: 'In Stock', unit: '500mg' },
+  { id: '2', name: 'Paracetamol', category: 'Analgesics', batchNumber: 'PCM-2023-042', price: 5.00, stock: 450, minStock: 50, expiryDate: '2025-12-01', status: 'In Stock', unit: '500mg' },
+  { id: '3', name: 'Ibuprofen', category: 'Anti-inflammatory', batchNumber: 'IBU-2023-112', price: 8.75, stock: 8, minStock: 20, expiryDate: '2024-11-20', status: 'Low Stock', unit: '400mg' },
+  { id: '4', name: 'Cetirizine Syrup', category: 'Antihistamine', batchNumber: 'CET-2023-089', price: 15.20, stock: 0, minStock: 10, expiryDate: '2023-10-15', status: 'Expired', unit: '5mg/5ml' },
+  { id: '5', name: 'Metformin', category: 'Antidiabetic', batchNumber: 'MET-2023-005', price: 10.00, stock: 200, minStock: 30, expiryDate: '2026-01-10', status: 'In Stock', unit: '500mg' },
+  { id: '6', name: 'Amlodipine', category: 'Antihypertensive', batchNumber: 'AML-2023-014', price: 18.30, stock: 15, minStock: 25, expiryDate: '2025-03-22', status: 'Low Stock', unit: '5mg' },
+  { id: '7', name: 'Omeprazole', category: 'Antacid', batchNumber: 'OME-2023-077', price: 22.00, stock: 80, minStock: 15, expiryDate: '2025-08-05', status: 'In Stock', unit: '20mg' },
 ];
 
 export const users: User[] = [
-  { id: 'U-001', name: 'Dr. Alex Rivera', email: 'alex@pharmacare.com', role: 'Admin', status: 'Active', lastActive: '2024-03-20 10:30', avatar: 'https://storage.googleapis.com/dala-prod-public-storage/generated-images/8806771f-b84f-4015-baaf-9dbb84498d2f/admin-avatar-5b948baf-1772000545457.webp' },
-  { id: 'U-002', name: 'Sarah Connor', email: 'sarah@pharmacare.com', role: 'Pharmacist', status: 'Active', lastActive: '2024-03-20 09:15', avatar: 'https://storage.googleapis.com/dala-prod-public-storage/generated-images/8806771f-b84f-4015-baaf-9dbb84498d2f/pharmacist-sarah-avatar-2aab5042-1772002152299.webp' },
+  { id: 'U-001', name: 'Dr. Alex Rivera', email: 'alex@pharmacare.com', role: 'Admin', status: 'Active', lastActive: '2024-03-20 10:30', avatar: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=100&h=100&fit=crop' },
+  { id: 'U-002', name: 'Sarah Connor', email: 'sarah@pharmacare.com', role: 'Pharmacist', status: 'Active', lastActive: '2024-03-20 09:15', avatar: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=100&h=100&fit=crop' },
   { id: 'U-003', name: 'John Matrix', email: 'john@pharmacare.com', role: 'Manager', status: 'Active', lastActive: '2024-03-19 16:45' },
-  { id: 'U-004', name: 'Kyle Reese', email: 'kyle@pharmacare.com', role: 'Cashier', status: 'Inactive', lastActive: '2024-03-15 11:20', avatar: 'https://storage.googleapis.com/dala-prod-public-storage/generated-images/8806771f-b84f-4015-baaf-9dbb84498d2f/cashier-kyle-avatar-fcf8f3ac-1772002152550.webp' },
+  { id: 'U-004', name: 'Kyle Reese', email: 'kyle@pharmacare.com', role: 'Cashier', status: 'Inactive', lastActive: '2024-03-15 11:20' },
 ];
 
 export const purchases: Purchase[] = [
@@ -29,9 +29,6 @@ export const stockAdjustments: StockAdjustment[] = [
 export const sales: Sale[] = [
   { id: 'S-1001', date: '2024-03-20', customerName: 'John Doe', totalAmount: 45.50, status: 'Paid', items: [] },
   { id: 'S-1002', date: '2024-03-20', customerName: 'Jane Smith', totalAmount: 12.50, status: 'Paid', items: [] },
-  { id: 'S-1003', date: '2024-03-19', customerName: 'Walk-in Customer', totalAmount: 32.00, status: 'Paid', items: [] },
-  { id: 'S-1004', date: '2024-03-19', customerName: 'Robert Wilson', totalAmount: 115.00, status: 'Pending', items: [] },
-  { id: 'S-1005', date: '2024-03-18', customerName: 'Alice Brown', totalAmount: 25.75, status: 'Paid', items: [] },
 ];
 
 export const suppliers: Supplier[] = [
@@ -43,7 +40,6 @@ export const suppliers: Supplier[] = [
 export const customers: Customer[] = [
   { id: 'C-001', name: 'John Doe', email: 'john.doe@example.com', phone: '+1 555-0101', lastPurchaseDate: '2024-03-20', totalSpent: 450.50 },
   { id: 'C-002', name: 'Jane Smith', email: 'jane.smith@example.com', phone: '+1 555-0102', lastPurchaseDate: '2024-03-20', totalSpent: 125.00 },
-  { id: 'C-003', name: 'Robert Wilson', email: 'robert.w@example.com', phone: '+1 555-0103', lastPurchaseDate: '2024-03-19', totalSpent: 890.25 },
 ];
 
 export const chartData = [

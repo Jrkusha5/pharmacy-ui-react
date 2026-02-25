@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { 
   Search, 
-  Plus, 
   UserPlus,
   Shield, 
-  MoreVertical, 
   Edit2, 
   Trash2, 
   CheckCircle2, 
@@ -13,16 +11,26 @@ import {
   ShieldCheck,
   ShieldAlert,
   UserCheck,
-  Users as UsersIcon
+  Users as UsersIcon,
+  X
 } from 'lucide-react';
 import { Card, Button, Input, Badge, cn } from '../components/UI';
-import { users } from '../data/mockData';
+import { users as initialUsers } from '../data/mockData';
 import { User, UserRole } from '../types';
 import { toast } from 'sonner';
 
 export const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  
+  const [users, setUsers] = useState<User[]>(initialUsers);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [formData, setFormData] = useState<Partial<User>>({
+    name: '',
+    email: '',
+    role: 'Cashier',
+    status: 'Active'
+  });
+
   const filteredUsers = users.filter(u => 
     u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     u.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -49,9 +57,55 @@ export const UserManagement = () => {
     }
   };
 
-  const handleStatusToggle = (userName: string, currentStatus: string) => {
-    const newStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
-    toast.success(`${userName} is now ${newStatus}`);
+  const handleStatusToggle = (id: string) => {
+    setUsers(prev => prev.map(u => {
+      if (u.id === id) {
+        const newStatus = u.status === 'Active' ? 'Inactive' : 'Active';
+        toast.success(`${u.name} is now ${newStatus}`);
+        return { ...u, status: newStatus as 'Active' | 'Inactive' };
+      }
+      return u;
+    }));
+  };
+
+  const handleDelete = (id: string) => {
+    if (confirm('Are you sure you want to delete this user?')) {
+      setUsers(prev => prev.filter(u => u.id !== id));
+      toast.success('User deleted successfully');
+    }
+  };
+
+  const handleOpenModal = (user: User | null = null) => {
+    if (user) {
+      setEditingUser(user);
+      setFormData(user);
+    } else {
+      setEditingUser(null);
+      setFormData({
+        name: '',
+        email: '',
+        role: 'Cashier',
+        status: 'Active'
+      });
+    }
+    setIsModalOpen(true);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editingUser) {
+      setUsers(prev => prev.map(u => u.id === editingUser.id ? { ...u, ...formData } as User : u));
+      toast.success('User updated successfully');
+    } else {
+      const newUser: User = {
+        ...formData as User,
+        id: `U-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
+        lastActive: 'Never'
+      };
+      setUsers(prev => [newUser, ...prev]);
+      toast.success('User added successfully');
+    }
+    setIsModalOpen(false);
   };
 
   return (
@@ -61,17 +115,17 @@ export const UserManagement = () => {
           <h1 className="text-2xl font-bold text-slate-900">User Management</h1>
           <p className="text-sm text-slate-500">Manage staff accounts, roles, and access permissions.</p>
         </div>
-        <Button className="flex items-center gap-2 rounded-xl shadow-lg shadow-blue-200">
+        <Button onClick={() => handleOpenModal()} className="flex items-center gap-2 rounded-xl shadow-lg shadow-blue-200">
           <UserPlus className="w-4 h-4" /> Add New User
         </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[
-          { label: 'Total Staff', count: '12', icon: UsersIcon, color: 'text-blue-600' },
-          { label: 'Administrators', count: '2', icon: ShieldAlert, color: 'text-rose-600' },
-          { label: 'Pharmacists', count: '6', icon: UserCheck, color: 'text-emerald-600' },
-          { label: 'Active Now', count: '4', icon: CheckCircle2, color: 'text-green-500' },
+          { label: 'Total Staff', count: users.length.toString(), icon: UsersIcon, color: 'text-blue-600' },
+          { label: 'Administrators', count: users.filter(u => u.role === 'Admin').length.toString(), icon: ShieldAlert, color: 'text-rose-600' },
+          { label: 'Pharmacists', count: users.filter(u => u.role === 'Pharmacist').length.toString(), icon: UserCheck, color: 'text-emerald-600' },
+          { label: 'Active Staff', count: users.filter(u => u.status === 'Active').length.toString(), icon: CheckCircle2, color: 'text-green-500' },
         ].map((stat, i) => (
           <Card key={i} className="p-4 border-none shadow-sm flex items-center justify-between">
             <div>
@@ -93,11 +147,6 @@ export const UserManagement = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="flex items-center gap-2 rounded-lg">
-              Filter Role
-            </Button>
           </div>
         </div>
 
@@ -155,15 +204,25 @@ export const UserManagement = () => {
                         variant="ghost" 
                         size="icon" 
                         title={user.status === 'Active' ? 'Deactivate' : 'Activate'}
-                        onClick={() => handleStatusToggle(user.name, user.status)}
+                        onClick={() => handleStatusToggle(user.id)}
                         className={cn("hover:bg-slate-100", user.status === 'Active' ? "text-amber-500" : "text-emerald-500")}
                       >
                         {user.status === 'Active' ? <XCircle className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
                       </Button>
-                      <Button variant="ghost" size="icon" className="hover:bg-blue-50 hover:text-blue-600">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="hover:bg-blue-50 hover:text-blue-600"
+                        onClick={() => handleOpenModal(user)}
+                      >
                         <Edit2 className="w-4 h-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="hover:bg-rose-50 hover:text-rose-600">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="hover:bg-rose-50 hover:text-rose-600"
+                        onClick={() => handleDelete(user.id)}
+                      >
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
@@ -174,6 +233,68 @@ export const UserManagement = () => {
           </table>
         </div>
       </Card>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+          <Card className="w-full max-w-md border-none shadow-2xl">
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-slate-900">{editingUser ? 'Edit User' : 'Add New User'}</h3>
+              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-600 uppercase">Full Name</label>
+                <Input 
+                  required
+                  value={formData.name}
+                  onChange={e => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="e.g. John Doe"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-600 uppercase">Email Address</label>
+                <Input 
+                  required
+                  type="email"
+                  value={formData.email}
+                  onChange={e => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="john@example.com"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-600 uppercase">Role</label>
+                <select 
+                  className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={formData.role}
+                  onChange={e => setFormData({ ...formData, role: e.target.value as UserRole })}
+                >
+                  <option value="Admin">Admin</option>
+                  <option value="Manager">Manager</option>
+                  <option value="Pharmacist">Pharmacist</option>
+                  <option value="Cashier">Cashier</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-600 uppercase">Status</label>
+                <select 
+                  className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={formData.status}
+                  onChange={e => setFormData({ ...formData, status: e.target.value as 'Active' | 'Inactive' })}
+                >
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </div>
+              <div className="pt-4 flex gap-3">
+                <Button type="button" variant="outline" className="flex-1" onClick={() => setIsModalOpen(false)}>Cancel</Button>
+                <Button type="submit" className="flex-1">{editingUser ? 'Save Changes' : 'Add User'}</Button>
+              </div>
+            </form>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };
